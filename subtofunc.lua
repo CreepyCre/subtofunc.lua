@@ -13,16 +13,16 @@ function subtofunc(subto, subscriber, post, priority)
 				locals[k] = v
 				index = index + 1
 			end
-			local preevent = Event:new{source = source, line = line, locals = locals}
-			runpresubs(subto, preevent, ...)
+			local preevent = Event:new{args = {...}, source = source, line = line, locals = locals}
+			runpresubs(subto, preevent)
 			local returnholder
 			if (not preevent.canceloriginal) then
-				returnholder = subscriptions[subto][3](...)
+				returnholder = subscriptions[subto][3](unpack(preevent.args))
 			end
-			local postevent = Event:new{source = source, line = line, locals = locals}
+			local postevent = Event:new{args = preevent.args, source = source, line = line, locals = locals}
 			if (preevent.returnholder == nil) then postevent.returnholder = returnholder
 			else postevent.returnholder = preevent.returnholder end
-			runpostsubs(subto, postevent, ...)
+			runpostsubs(subto, postevent)
 			return postevent.returnholder
 		end
 	end
@@ -60,12 +60,12 @@ function sortnewsub(sublist)
 	end
 end
 
-function runpresubs(subto, preevent, ...)
-	for i,f in ipairs(subscriptions[subto][1]) do f[1](preevent, ...) end
+function runpresubs(subto, preevent)
+	for i,f in ipairs(subscriptions[subto][1]) do f[1](preevent) end
 end
 
-function runpostsubs(subto, postevent, ...)
-	for i,f in ipairs(subscriptions[subto][2]) do f[1](postevent, ...) end
+function runpostsubs(subto, postevent)
+	for i,f in ipairs(subscriptions[subto][2]) do f[1](postevent) end
 end
 
 function getoriginal(funcname)
@@ -79,7 +79,7 @@ subscriptions = {}
 
 
 
-Event = {canceled = false, canceloriginal = false, source = nil, line = nil, locals = nil, returnholder = nil}
+Event = {canceled = false, canceloriginal = false, args = nil, source = nil, line = nil, locals = nil, returnholder = nil}
 
 function Event:new(o)
 	o = o or {}
