@@ -35,6 +35,18 @@ function subtofunc(subto, subscriber, post, priority)
 	end
 end
 
+function unsub(subbedto, subscriber, post)
+	local subtable = post and subscriptions[subbedto][2] or subscriptions[subbedto][1]
+	local index = 1
+	while (index <= #subtable) do
+		if (subtable[index][1] == subscriber) then
+			table.remove(subtable, index)
+		else
+			index = index + 1
+		end
+	end
+end
+
 function sortnewsub(sublist)
 	for i = #sublist, 1, -1 do
 		if sublist[i][2] > sublist[#sublist][2] and (i == 1 or sublist[i-1][2] <= sublist[#sublist][2]) then
